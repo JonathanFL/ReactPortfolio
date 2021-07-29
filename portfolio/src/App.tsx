@@ -1,25 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { ReactElement, useReducer, FC } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { Helmet } from "react-helmet";
+
+// components
+import Layout from "./components/Layout/Layout";
+
+// app routes
+import { routes } from "./config/routes";
+
+// constants
+import { APP_TITLE } from "./utils/constants";
+
+// interfaces
+import RouteItem from "./model/RouteItem.model";
+
+// default component
+const DefaultComponent: FC<{}> = (): ReactElement => <div>{`No Component Defined.`}</div>;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Helmet>
+        <title>{APP_TITLE}</title>
+      </Helmet>
+      <Router>
+        <Switch>
+          <Layout>
+            {/* for each route config, a react route is created */}
+            {routes.map((route: RouteItem) =>
+              route.subRoutes ? (
+                route.subRoutes.map((item: RouteItem) => (
+                  <Route
+                    key={`${item.key}`}
+                    path={`${item.path}`}
+                    component={item.component || DefaultComponent}
+                    exact
+                  />
+                ))
+              ) : (
+                <Route
+                  key={`${route.key}`}
+                  path={`${route.path}`}
+                  component={route.component || DefaultComponent}
+                  exact
+                />
+              )
+            )}
+          </Layout>
+        </Switch>
+      </Router>
+    </>
   );
 }
 
